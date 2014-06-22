@@ -31,23 +31,23 @@ def ex_disc(h0):
     err = max(abs(uh-uexact))
     print "max error = %f" % err
 
-def ex_disc_refine(h0):
+def ex_disc_refine(h0,**kwargs):
+    stages = kwargs.get('stages',4)
     print "  meshing ..."
     p1, t1 = distmesh2d(fd_disc, huniform, h0, bbox, [])
     pts, mytri = fixmesh(p1,t1)
-    edges, tedges = edgelist(pts,mytri)
-    print "  original mesh has %d nodes and %d edges" % (np.shape(pts)[0],np.shape(edges)[0])
+    edges, tmp = edgelist(pts,mytri)
     fig1 = plt.figure()
-    plt.subplot(1,2,1)
-    plotmesh(pts, mytri)
-    plt.title('original mesh')
-    rp, rt, e, ind = bdyrefine(pts,mytri,fd_disc,h0)
-    redges, tmp = edgelist(rp,rt)
-    print "  refined mesh has %d nodes and %d edges" % (np.shape(rp)[0],np.shape(redges)[0])
-    plt.subplot(1,2,2)
-    plotmesh(rp, rt)
-    plt.title('final refined mesh')
-    uh, inside = poisson(f_ex,fd_disc,h0,rp,rt,announce=True)
+    for s in range(stages):
+      print "  mesh %d has %d nodes and %d edges" % (s, np.shape(pts)[0], np.shape(edges)[0])
+      plt.subplot(2,2,s+1)
+      plotmesh(pts, mytri)
+      plt.title('mesh %d' % s)
+      rp, rt, e, ind = bdyrefine(pts,mytri,fd_disc,h0)
+      edges, tmp = edgelist(rp,rt)
+      pts = rp
+      mytri = rt
+    uh, inside = poisson(f_ex,fd_disc,h0,pts,mytri,announce=True)
     print "  plotting ..."
     fig4 = plt.figure()
     ax = fig4.gca(projection='3d')
@@ -81,5 +81,7 @@ def ex_ell(h0):
         ax.plot_trisurf(pts[:,0], pts[:,1], uh, TRI.triangles, cmap=cm.jet, linewidth=0.2)
 
 if __name__ == '__main__':
-    ex_disc_refine(0.2)
+    #ex_disc_refine(0.35)
+    ex_disc_refine(0.2,stages=2)
+    #ex_ell(0.1)
     plt.show()

@@ -55,18 +55,17 @@ def psi_fourth(pts):
 def psi_sphere(pts):
     return np.sqrt(np.maximum(0.0,0.25 - pts[:,0]**2 - pts[:,1]**2))
 
-def obscircle(h0,psifcn):
-    print "  meshing and fixing mesh ..."
-    p1, t1 = distmesh2d(fd_disc, huniform, h0, bbox, [])
-    p1a, t1a = fixmesh(p1,t1)
-    print "     ... original mesh has %d nodes" % np.shape(p1a)[0]
+def obscircle(h0,psifcn,**kwargs):
+    refine = kwargs.get('refine',2)
 
-    print "  refining mesh once ..."
-    p2, t2, e, ind = bdyrefine(p1a,t1a,fd_disc,h0)
-    print "     ... first refined mesh has %d nodes" % np.shape(p2)[0]
-    print "  refining mesh again ..."
-    pts, mytri, e, ind = bdyrefine(p2,t2,fd_disc,h0)
-    print "     ... second refined mesh has %d nodes" % np.shape(pts)[0]
+    print "  meshing and fixing mesh ... ",
+    pts, mytri = distmesh2d(fd_disc, huniform, h0, bbox, [])
+    pts, mytri = fixmesh(pts,mytri)
+    print "mesh has %d nodes" % np.shape(pts)[0]
+    for s in range(refine):
+        print "  refining mesh ...",
+        pts, mytri, e, ind = bdyrefine(pts,mytri,fd_disc,h0)
+        print "mesh has %d nodes" % np.shape(pts)[0]
 
     print "  solving ..."
     tol = 1.0e-6
@@ -83,8 +82,7 @@ def obscircle(h0,psifcn):
 
     fig2 = plt.figure()
     ax = fig2.gca(projection='3d')
-    #ax.plot_trisurf(pts[:,0], pts[:,1], psi, cmap=cm.Blues, linewidth=0.1)
-    ax.plot_trisurf(pts[:,0], pts[:,1], uh, cmap=cm.jet, linewidth=0.2)
+    ax.plot_trisurf(pts[:,0], pts[:,1], uh, cmap=cm.jet, linewidth=0.15)
     ax.set_xlim3d(-1.0,1.0)
     ax.set_ylim3d(-1.0,1.0)
     ax.set_zlim3d(-0.25,1.25)
@@ -104,5 +102,5 @@ def obscircle(h0,psifcn):
 
 if __name__ == '__main__':
     #obscircle(0.2,psi_fourth)
-    obscircle(0.2,psi_sphere)
+    obscircle(0.2,psi_sphere,refine=3)
     plt.show()

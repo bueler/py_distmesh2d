@@ -39,56 +39,48 @@ def example_1a():
     figure()
     pts, tri = distmesh2d(example1, huniform, 0.4, bbox, [])
     plotmesh(pts, tri)
-    show()
 
 # example 1b
 def example_1b():
     figure()
     pts, tri = distmesh2d(example1, huniform, 0.2, bbox, [])
     plotmesh(pts, tri)
-    show()
 
 # example 1c
 def example_1c():
     figure()
     pts, tri = distmesh2d(example1, huniform, 0.1, bbox, [])
     plotmesh(pts, tri)
-    show()
 
 # example 2
 def example_2():
     figure()
     pts, tri = distmesh2d(example2, huniform, 0.1, bbox, [])
     plotmesh(pts, tri)
-    show()
 
 # example 3a
 def example_3a():
     figure()
     pts, tri = distmesh2d(example3, huniform, 0.15, bbox, square)
     plotmesh(pts, tri, example3(pts))
-    show()
 
 # example 3b
 def example_3b():
     figure()
     pts, tri = distmesh2d(example3, example3_h, 0.035, bbox, square)
     plotmesh(pts, tri)
-    show()
 
 # example (current online version)
 def example_3_online():
     figure()
     pts, tri = distmesh2d(example3_online, example3_online_h, 0.02, bbox, square)
     plotmesh(pts, tri)
-    show()
 
 # annulus, non-uniform
 def annulus():
     figure()
     pts, tri = distmesh2d(example2, annulus_h, 0.04, bbox, square)
     plotmesh(pts, tri)
-    show()
 
 # a "star" built using circles
 def star_mesh():
@@ -97,7 +89,6 @@ def star_mesh():
     pfix = [[0.25, 0.25], [-0.25, 0.25], [-0.25, -0.25], [0.25, -0.25]]
     pts, tri = distmesh2d(star, huniform, 0.1, bbox, pfix)
     plotmesh(pts, tri)
-    show()
 
 # a circle, finer mesh near the boundary
 def circle_nonuniform():
@@ -105,7 +96,6 @@ def circle_nonuniform():
     # fake the corners:
     pts, tri = distmesh2d(example1, circle_h, 0.1, bbox, [])
     plotmesh(pts, tri)
-    show()
 
 def ell():
     """L-shaped domain from 'Finite Elements and Fast Iterative Solvers'
@@ -119,7 +109,7 @@ def ell():
     figure()
     pts, tri = distmesh2d(d, huniform, 0.25, bbox, pfix)
     plotmesh(pts, tri)
-    show()
 
 if __name__ == '__main__':
-    example_3_online()
+    star_mesh()
+    show()
