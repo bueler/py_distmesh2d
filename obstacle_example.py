@@ -55,9 +55,8 @@ def psi_fourth(pts):
 def psi_sphere(pts):
     return np.sqrt(np.maximum(0.0,0.25 - pts[:,0]**2 - pts[:,1]**2))
 
-def obscircle(h0,psifcn,**kwargs):
+def refinedisc(h0,**kwargs):
     refine = kwargs.get('refine',2)
-
     print "  meshing and fixing mesh ... ",
     pts, mytri = distmesh2d(fd_disc, huniform, h0, bbox, [])
     pts, mytri = fixmesh(pts,mytri)
@@ -66,7 +65,10 @@ def obscircle(h0,psifcn,**kwargs):
         print "  refining mesh ...",
         pts, mytri, e, ind = bdyrefine(pts,mytri,fd_disc,h0)
         print "mesh has %d nodes" % np.shape(pts)[0]
+    return pts, mytri
 
+def obscircle(h0,pts,mytri,psifcn,**kwargs):
+    showiter = kwargs.get('showiter',False)
     print "  solving ..."
     tol = 1.0e-6
     uh, ii, ierr = obstacle(psifcn, f_ex, tol, fd_disc, h0, pts, mytri, \
@@ -74,33 +76,35 @@ def obscircle(h0,psifcn,**kwargs):
     print "  obstacle: %d iterations total to reach iteration tolerance %.2e" \
         % (len(ierr), tol)
 
-    psi = np.maximum(psifcn(pts),-1.0*np.ones(np.shape(pts)[0]))
     fig1 = plt.figure()
-    plotmesh(pts, mytri)
+    plotmesh(pts, mytri, lw=1.0)
+    psi = np.maximum(psifcn(pts),-1.0*np.ones(np.shape(pts)[0]))
     coin = (uh==psi)   # coincidence set
-    plt.plot(pts[coin,0],pts[coin,1],'ro',markersize=8.0)
+    plt.plot(pts[coin,0],pts[coin,1],'ro',markersize=6.0)
 
     fig2 = plt.figure()
-    ax = fig2.gca(projection='3d')
+    ax = plt.gca(projection='3d')
     ax.plot_trisurf(pts[:,0], pts[:,1], uh, cmap=cm.jet, linewidth=0.15)
     ax.set_xlim3d(-1.0,1.0)
     ax.set_ylim3d(-1.0,1.0)
     ax.set_zlim3d(-0.25,1.25)
 
-    fig4 = plt.figure()
-    plt.semilogy(np.array(range(len(ierr)))+1.0,ierr,'o-')
-    plt.xlabel('j = iteration')
-    plt.ylabel('max diff successive iterations')
-    plt.grid(True)
+    if showiter:
+        fig3 = plt.figure()
+        plt.semilogy(np.array(range(len(ierr)))+1.0,ierr,'o-')
+        plt.xlabel('j = iteration')
+        plt.ylabel('max diff successive iterations')
+        plt.grid(True)
 
     if psifcn == psi_sphere:
         print
         print 'for sphere obstacle, exact solution is known:'
-        print '  (away from the obstacle:  u(r) = b log(r) )'
         apart = (uh > psi)
         print '  max norm error = %.3e' % max(abs(uh[apart] - u_exact_sphere(pts[apart])))
 
 if __name__ == '__main__':
-    #obscircle(0.2,psi_fourth)
-    obscircle(0.2,psi_sphere,refine=3)
+    h0 = 0.2
+    pts, mytri = refinedisc(h0,refine=2)
+    #obscircle(h0,pts,mytri,psi_fourth)
+    obscircle(h0,pts,mytri,psi_sphere)
     plt.show()

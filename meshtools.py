@@ -162,12 +162,13 @@ def bdyrefine(pts,tri,f_dist,h0,*args):
 # plotmesh by C. Khroulev and E. Bueler
 def plotmesh(pts, tri, *args, **kwargs):
     showindex = kwargs.get('index',False)
+    mylinewidth = kwargs.get('lw',2.0)
     h0 = kwargs.get('h0',0.0)
     edges = kwargs.get('edges',np.array([]))
     if len(args) > 0:
-        tripcolor(pts[:,0], pts[:,1], tri, args[0], edgecolor='black', cmap="Blues")
+        tripcolor(pts[:,0], pts[:,1], tri, args[0], edgecolor='black', cmap="Blues", lw=mylinewidth)
     else:
-        triplot(pts[:,0], pts[:,1], tri, "k-", lw=2)
+        triplot(pts[:,0], pts[:,1], tri, "k-", lw=mylinewidth)
     if showindex:
         dx = h0/10.0
         for i in range(np.shape(tri)[0]):   # label triangle index in green
