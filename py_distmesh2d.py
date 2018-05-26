@@ -54,6 +54,8 @@ def distmesh2d(fd, fh, h0, bbox, pfix, *args):
 
     # discard exterior points
     p = p[fd(p, *args) < geps]
+
+    # decimate (rejection method) using triangle size function
     r0 = 1.0 / fh(p, *args)**2
     selection = np.random.rand(p.shape[0], 1) < r0 / r0.max()
     p = p[selection[:,0]]
